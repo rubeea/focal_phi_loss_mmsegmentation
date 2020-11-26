@@ -58,7 +58,7 @@ class BaseDecodeHead(nn.Module, metaclass=ABCMeta):
                      type='CrossEntropyLoss',
                      use_sigmoid=False,
                      loss_weight=1.0),
-                 ignore_index=255,
+                 ignore_index=None,
                  sampler=None,
                  align_corners=False):
         super(BaseDecodeHead, self).__init__()
