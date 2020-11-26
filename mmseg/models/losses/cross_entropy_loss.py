@@ -60,7 +60,7 @@ def binary_cross_entropy(pred,
                          reduction='mean',
                          avg_factor=None,
                          class_weight=None,
-                         ignore_index=255):
+                         ignore_index=None):
     """Calculate the binary CrossEntropy loss.
 
     Args:
