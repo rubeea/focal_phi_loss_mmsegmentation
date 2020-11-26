@@ -1,5 +1,5 @@
 # model settings
-norm_cfg = dict(type='SyncBN', requires_grad=True)
+norm_cfg = dict(type='BN', requires_grad=True) #for non-distributed training use BN instead of SyncBN
 model = dict(
     type='EncoderDecoder',
     pretrained='open-mmlab://resnet50_v1c',
