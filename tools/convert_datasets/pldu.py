@@ -13,9 +13,9 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Convert PLDU dataset to mmsegmentation format')
     parser.add_argument(
-        'training_path', help='the training part of PLDU dataset')
+        'images_path', help='the images part of PLDU dataset')
     parser.add_argument(
-        'testing_path', help='the testing part of PLDU dataset')
+        'labels_path', help='the labels part of PLDU dataset')
     parser.add_argument('--tmp_dir', help='path of the temporary directory')
     parser.add_argument('-o', '--out_dir', help='output path')
     args = parser.parse_args()
@@ -24,8 +24,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-    training_path = args.training_path
-    testing_path = args.testing_path
+    images_path = args.images_path
+    labels_path = args.labels_path
     if args.out_dir is None:
         out_dir = osp.join('data', 'pldu')
     else:
@@ -41,11 +41,11 @@ def main():
     mmcv.mkdir_or_exist(osp.join(out_dir, 'ann_dir', 'val'))
 
     with tempfile.TemporaryDirectory(dir=args.tmp_dir) as tmp_dir:
-        print('Extracting training.zip...')
-        zip_file = zipfile.ZipFile(training_path)
+        print('Extracting images.zip...')
+        zip_file = zipfile.ZipFile(images_path)
         zip_file.extractall(tmp_dir)
 
-        print('Generating training dataset...')
+        print('Generating training and validation datasets...')
         now_dir = osp.join(tmp_dir, 'images')
         for img_name in os.listdir(now_dir)[:TRAIN_LEN]:
             img = mmcv.imread(osp.join(now_dir, img_name))
@@ -54,21 +54,8 @@ def main():
                 osp.join(
                     out_dir, 'img_dir', 'train',
                     osp.splitext(img_name)[0] +'.jpg'))
-
-        now_dir = osp.join(tmp_dir, 'gt')
-        for img_name in os.listdir(now_dir)[:TRAIN_LEN]:
-            img = mmcv.imread(osp.join(now_dir, img_name))
-            mmcv.imwrite(
-                img[:, :, 0] // 128,
-                osp.join(out_dir, 'ann_dir', 'train',
-                         osp.splitext(img_name)[0] + '.png'))
-
-        print('Extracting test.zip...')
-        zip_file = zipfile.ZipFile(testing_path)
-        zip_file.extractall(tmp_dir)
-
-        print('Generating validation dataset...')
-        now_dir = osp.join(tmp_dir, 'images')
+            
+         
         for img_name in os.listdir(now_dir)[TRAIN_LEN:]:
             img = mmcv.imread(osp.join(now_dir, img_name))
             mmcv.imwrite(
@@ -77,8 +64,21 @@ def main():
                     out_dir, 'img_dir', 'val',
                     osp.splitext(img_name)[0] + '.jpg'))
 
-        now_dir = osp.join(tmp_dir, 'gt')
+        print('Extracting labels.zip...')
+        zip_file = zipfile.ZipFile(labels_path)
+        zip_file.extractall(tmp_dir)
+
+        print('Generating annotations for training and validation datasets...')
+        
         if osp.exists(now_dir):
+            now_dir = osp.join(tmp_dir, 'gt')
+            for img_name in os.listdir(now_dir)[:TRAIN_LEN]:
+                img = mmcv.imread(osp.join(now_dir, img_name))
+                mmcv.imwrite(
+                    img[:, :, 0] // 128,
+                    osp.join(out_dir, 'ann_dir', 'train',
+                             osp.splitext(img_name)[0] + '.png'))
+            
             for img_name in os.listdir(now_dir)[TRAIN_LEN:]:
                 img = mmcv.imread(osp.join(now_dir, img_name))
                 # The annotation img should be divided by 128, because some of
@@ -90,7 +90,7 @@ def main():
                     img[:, :, 0] // 128,
                     osp.join(out_dir, 'ann_dir', 'val',
                              osp.splitext(img_name)[0] + '.png'))
-
+        
         
         print('Removing the temporary files...')
 
