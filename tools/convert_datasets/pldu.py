@@ -6,6 +6,8 @@ import zipfile
 
 import cv2
 import mmcv
+from PIL import Image  
+import PIL  
 
 TRAIN_LEN= 363 #80% of the total dataset (453 images)
 
@@ -47,24 +49,18 @@ def main():
 
         print('Generating training and validation datasets...')
         now_dir = osp.join(tmp_dir, 'images')
-        for img_name in os.listdir(now_dir)[:TRAIN_LEN]:
-            img = mmcv.imread(osp.join(now_dir, img_name))
-            mmcv.imwrite(
-                img,
-                osp.join(
-                    out_dir, 'img_dir', 'train',
+        for img_name in sorted(os.listdir(now_dir))[:TRAIN_LEN]:
+            img = Image.open(osp.join(now_dir, img_name))
+            img= img.save(osp.join(out_dir, 'img_dir', 'train',
                     osp.splitext(img_name)[0] +'.jpg'))
             
          
-        for img_name in os.listdir(now_dir)[TRAIN_LEN:]:
-            img = mmcv.imread(osp.join(now_dir, img_name))
-            mmcv.imwrite(
-                img,
-                osp.join(
-                    out_dir, 'img_dir', 'val',
+        for img_name in sorted(os.listdir(now_dir))[TRAIN_LEN:]:
+            img =Image.open(osp.join(now_dir, img_name))
+            img= img.save(osp.join(out_dir, 'img_dir', 'val',
                     osp.splitext(img_name)[0] + '.jpg'))
 
-        print('Extracting labels.zip...')
+        print('Extracting gt.zip...')
         zip_file = zipfile.ZipFile(labels_path)
         zip_file.extractall(tmp_dir)
 
@@ -72,23 +68,19 @@ def main():
         
         if osp.exists(now_dir):
             now_dir = osp.join(tmp_dir, 'gt')
-            for img_name in os.listdir(now_dir)[:TRAIN_LEN]:
-                img = mmcv.imread(osp.join(now_dir, img_name))
-                mmcv.imwrite(
-                    img[:, :, 0] // 128,
-                    osp.join(out_dir, 'ann_dir', 'train',
+            for img_name in sorted(os.listdir(now_dir))[:TRAIN_LEN]:
+                img = Image.open(osp.join(now_dir, img_name))
+                img=img.save(osp.join(out_dir, 'ann_dir', 'train',
                              osp.splitext(img_name)[0] + '.png'))
             
-            for img_name in os.listdir(now_dir)[TRAIN_LEN:]:
-                img = mmcv.imread(osp.join(now_dir, img_name))
+            for img_name in sorted (os.listdir(now_dir))[TRAIN_LEN:]:
+                img = Image.open(osp.join(now_dir, img_name))
                 # The annotation img should be divided by 128, because some of
                 # the annotation imgs are not standard. We should set a
                 # threshold to convert the nonstandard annotation imgs. The
                 # value divided by 128 is equivalent to '1 if value >= 128
                 # else 0'
-                mmcv.imwrite(
-                    img[:, :, 0] // 128,
-                    osp.join(out_dir, 'ann_dir', 'val',
+                img= img.save(osp.join(out_dir, 'ann_dir', 'val',
                              osp.splitext(img_name)[0] + '.png'))
         
         
