@@ -13,9 +13,9 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Convert PLDU dataset to mmsegmentation format')
     parser.add_argument(
-        'training_path', help='the training part of DRIVE dataset')
+        'training_path', help='the training part of PLDU dataset')
     parser.add_argument(
-        'testing_path', help='the testing part of DRIVE dataset')
+        'testing_path', help='the testing part of PLDU dataset')
     parser.add_argument('--tmp_dir', help='path of the temporary directory')
     parser.add_argument('-o', '--out_dir', help='output path')
     args = parser.parse_args()
@@ -27,7 +27,7 @@ def main():
     training_path = args.training_path
     testing_path = args.testing_path
     if args.out_dir is None:
-        out_dir = osp.join('data', 'PLDU')
+        out_dir = osp.join('data', 'pldu')
     else:
         out_dir = args.out_dir
 
