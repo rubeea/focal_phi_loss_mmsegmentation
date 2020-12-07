@@ -16,13 +16,12 @@ class PLDUDataset(CustomDataset):
 
     CLASSES = ('background', 'powerline')
 
-    PALETTE = [[0, 0, 0], [255, 255, 255]]
+    PALETTE = [[120, 120, 120], [6, 230, 230]]
 
     def __init__(self, **kwargs):
         super(PLDUDataset, self).__init__(
             img_suffix='.jpg',
             seg_map_suffix='.png',
             reduce_zero_label=False,
-            ignore_index=None,
             **kwargs)
         assert osp.exists(self.img_dir)
