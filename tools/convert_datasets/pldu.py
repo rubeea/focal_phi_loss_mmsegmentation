@@ -9,15 +9,19 @@ import mmcv
 from PIL import Image  
 import PIL  
 
-TRAIN_LEN= 363 #80% of the total dataset (453 images)
+
 
 def parse_args():
     parser = argparse.ArgumentParser(
         description='Convert PLDU dataset to mmsegmentation format')
     parser.add_argument(
-        'images_path', help='the images part of PLDU dataset')
+        'train_images_path', help='the train images part of PLDU dataset')
     parser.add_argument(
-        'labels_path', help='the labels part of PLDU dataset')
+        'train_labels_path', help='the train labels part of PLDU dataset')
+    parser.add_argument(
+        'val_images_path', help='the val images part of PLDU dataset')
+    parser.add_argument(
+        'val_labels_path', help='the val labels part of PLDU dataset')
     parser.add_argument('--tmp_dir', help='path of the temporary directory')
     parser.add_argument('-o', '--out_dir', help='output path')
     args = parser.parse_args()
@@ -26,8 +30,11 @@ def parse_args():
 
 def main():
     args = parse_args()
-    images_path = args.images_path
-    labels_path = args.labels_path
+    train_images_path = args.train_images_path
+    train_labels_path = args.train_labels_path
+    val_images_path = args.val_images_path
+    val_labels_path = args.val_labels_path
+    
     if args.out_dir is None:
         out_dir = osp.join('data', 'pldu')
     else:
@@ -43,44 +50,54 @@ def main():
     mmcv.mkdir_or_exist(osp.join(out_dir, 'ann_dir', 'val'))
 
     with tempfile.TemporaryDirectory(dir=args.tmp_dir) as tmp_dir:
-        print('Extracting images.zip...')
-        zip_file = zipfile.ZipFile(images_path)
+        print('Extracting train images.zip...')
+        zip_file = zipfile.ZipFile(train_images_path)
         zip_file.extractall(tmp_dir)
 
-        print('Generating training and validation datasets...')
+        print('Generating image training dataset...')
         now_dir = osp.join(tmp_dir, 'images')
-        for img_name in sorted(os.listdir(now_dir))[:TRAIN_LEN]:
+        for img_name in sorted(os.listdir(now_dir)):
             img = Image.open(osp.join(now_dir, img_name))
             img= img.save(osp.join(out_dir, 'img_dir', 'train',
                     osp.splitext(img_name)[0] +'.jpg'))
             
-         
-        for img_name in sorted(os.listdir(now_dir))[TRAIN_LEN:]:
-            img =Image.open(osp.join(now_dir, img_name))
-            img= img.save(osp.join(out_dir, 'img_dir', 'val',
-                    osp.splitext(img_name)[0] + '.jpg'))
-
-        print('Extracting gt.zip...')
-        zip_file = zipfile.ZipFile(labels_path)
+     with tempfile.TemporaryDirectory(dir=args.tmp_dir) as tmp_dir:
+        print('Extracting val images.zip...')
+        zip_file = zipfile.ZipFile(val_images_path)
         zip_file.extractall(tmp_dir)
 
-        print('Generating annotations for training and validation datasets...')
+        print('Generating image training dataset...')
+        now_dir = osp.join(tmp_dir, 'images')
+        for img_name in sorted(os.listdir(now_dir)):
+            img = Image.open(osp.join(now_dir, img_name))
+            img= img.save(osp.join(out_dir, 'img_dir', 'val',
+                    osp.splitext(img_name)[0] +'.jpg'))
+            
+
+        print('Extracting train_gt.zip...')
+        zip_file = zipfile.ZipFile(train_labels_path)
+        zip_file.extractall(tmp_dir)
+
+        print('Generating annotations for training dataset...')
         
         if osp.exists(now_dir):
-            now_dir = osp.join(tmp_dir, 'gt')
-            for img_name in sorted(os.listdir(now_dir))[:TRAIN_LEN]:
+            now_dir = osp.join(tmp_dir, 'train_gt')
+            for img_name in sorted(os.listdir(now_dir)):
                 img = Image.open(osp.join(now_dir, img_name))
                 img=img.save(osp.join(out_dir, 'ann_dir', 'train',
                              osp.splitext(img_name)[0] + '.png'))
-            
-            for img_name in sorted (os.listdir(now_dir))[TRAIN_LEN:]:
+        
+        print('Extracting val_gt.zip...')
+        zip_file = zipfile.ZipFile(val_labels_path)
+        zip_file.extractall(tmp_dir)
+
+        print('Generating annotations for validation dataset...')
+        
+        if osp.exists(now_dir):
+            now_dir = osp.join(tmp_dir, 'val_gt')
+            for img_name in sorted(os.listdir(now_dir)):
                 img = Image.open(osp.join(now_dir, img_name))
-                # The annotation img should be divided by 128, because some of
-                # the annotation imgs are not standard. We should set a
-                # threshold to convert the nonstandard annotation imgs. The
-                # value divided by 128 is equivalent to '1 if value >= 128
-                # else 0'
-                img= img.save(osp.join(out_dir, 'ann_dir', 'val',
+                img=img.save(osp.join(out_dir, 'ann_dir', 'val',
                              osp.splitext(img_name)[0] + '.png'))
         
         
