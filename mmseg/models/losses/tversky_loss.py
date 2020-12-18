@@ -7,20 +7,9 @@ from .utils import weight_reduce_loss
 from .cross_entropy_loss import _expand_onehot_labels
 
 def tversky(inputs, targets, alpha, beta, smooth):
-      
-        # print(inputs.shape) [2,2,256,256] => [N,C,H,W]
-        # print(targets.shape) [2,256,256] => [N,H,W]
-        
-        if inputs.dim() != targets.dim():
-            assert (inputs.dim() == 2 and targets.dim() == 1) or (
-                inputs.dim() == 4 and targets.dim() == 3), \
-            'Only pred shape [N, C], label shape [N] or pred shape [N, C, ' \
-            'H, W], label shape [N, H, W] are supported'
-            label, weight = _expand_onehot_labels(target, weight, x.shape,
-                                                ignore_index) #use imported version from cross_entropy_loss
                                                 
-        inputs = F.sigmoid(inputs)
-        targets= label.type_as(x)
+        inputs = inputs.sigmoid()
+        # targets= targets.type_as(inputs)
         
         #flatten label and prediction tensors
         inputs = inputs.view(-1)
@@ -32,7 +21,7 @@ def tversky(inputs, targets, alpha, beta, smooth):
         FN = (targets * (1-inputs)).sum()
         
         Tversky = (TP + smooth) / (TP + alpha*FP + beta*FN + smooth)
-        return Tversky, weight
+        return Tversky
 
 @LOSSES.register_module()
 class TverskyLoss(nn.Module):
@@ -69,17 +58,28 @@ class TverskyLoss(nn.Module):
 
     def forward(self,
                 inputs,
-                target,
+                targets,
                 weight=None,
                 avg_factor=None,
                 reduction_override=None,
+                ignore_index=255,
                 **kwargs):
         """Forward function."""
         assert reduction_override in (None, 'none', 'mean', 'sum')
         reduction = (
             reduction_override if reduction_override else self.reduction)
+        # print(inputs.shape) #[2,2,256,256] => [N,C,H,W]
+        # print(targets.shape) #[2,256,256] => [N,H,W]
         
-        tversky_val, weight= tversky(inputs,targets,self.alpha,self.beta,self.smooth) 
+        if inputs.dim() != targets.dim():
+            assert (inputs.dim() == 2 and targets.dim() == 1) or (
+                inputs.dim() == 4 and targets.dim() == 3), \
+            'Only pred shape [N, C], label shape [N] or pred shape [N, C, ' \
+            'H, W], label shape [N, H, W] are supported'
+            label = _expand_onehot_labels(targets, weight, inputs.shape,
+                                                ignore_index) #use imported version from cross_entropy_loss
+
+        tversky_val= tversky(inputs,label,self.alpha,self.beta,self.smooth) 
         
         
         if self.use_focal:
@@ -89,6 +89,8 @@ class TverskyLoss(nn.Module):
           
         else:
           tversky_loss= (1-tversky_val)
+          # print(weight)
+          # print(weight.shape) #[2,2,256,256]
           loss = weight_reduce_loss(tversky_loss, weight, reduction, None)
           loss = self.loss_weight * loss
         return loss
