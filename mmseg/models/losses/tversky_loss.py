@@ -23,9 +23,9 @@ def tversky(inputs, targets, alpha, beta, smooth):
     # to use .sum with TP,FP and FN, weights must also be summed using .sum() in weighted reduction loss
     
 
-    TP = (inputs * targets) #.sum()
-    FP = ((1 - targets) * inputs) #.sum()
-    FN = (targets * (1 - inputs)) #.sum()
+    TP = (inputs * targets).sum()
+    FP = ((1 - targets) * inputs).sum()
+    FN = (targets * (1 - inputs)).sum()
 
     Tversky = (TP + smooth) / (TP + alpha * FP + beta * FN + smooth)
 
@@ -95,7 +95,7 @@ class TverskyLoss(nn.Module):
             loss = self.loss_weight * loss
     
         else:
-            # weight= weight.sum()
+            weight= weight.sum()
             tversky_loss = (1. - tversky_val)
             # print(tversky_loss.shape) #[2,2,256,256]
             loss = weight_reduce_loss(tversky_loss, weight, reduction, None)
