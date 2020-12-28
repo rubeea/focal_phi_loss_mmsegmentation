@@ -92,6 +92,6 @@ def mean_iou(results, gt_seg_maps, num_classes, ignore_index, nan_to_num=None):
     TP,FP,TN,FN= perf_measure(results,gt_seg_maps)
     
     if nan_to_num is not None:
-        return all_acc, np.nan_to_num(acc, nan=nan_to_num), \
+        return all_acc, TP, FP, TN, FN, np.nan_to_num(acc, nan=nan_to_num), \
             np.nan_to_num(iou, nan=nan_to_num), np.nan_to_num(dice, nan=nan_to_num)
     return all_acc, TP, FP, TN, FN, acc, iou, dice
