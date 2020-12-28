@@ -33,6 +33,23 @@ def intersect_and_union(pred_label, label, num_classes, ignore_index):
 
     return area_intersect, area_union, area_pred_label, area_label
 
+def perf_measure(preds, labels):
+    TP = 0
+    FP = 0
+    TN = 0
+    FN = 0
+
+    for j in range(len(preds)): 
+        if preds[j]==1 and labels[j]==1:
+           TP += 1
+        elif preds[j]==1 and labels[j]==0:
+           FP += 1
+        elif preds[j]==0 and labels[j]==0:
+           TN += 1
+        elif preds[j]==0 and labels[j]==1:
+           FN += 1
+
+    return (TP, FP, TN, FN)
 
 def mean_iou(results, gt_seg_maps, num_classes, ignore_index, nan_to_num=None):
     """Calculate Intersection and Union (IoU)
@@ -57,6 +74,7 @@ def mean_iou(results, gt_seg_maps, num_classes, ignore_index, nan_to_num=None):
     total_area_union = np.zeros((num_classes, ), dtype=np.float)
     total_area_pred_label = np.zeros((num_classes, ), dtype=np.float)
     total_area_label = np.zeros((num_classes, ), dtype=np.float)
+   
     for i in range(num_imgs):
         area_intersect, area_union, area_pred_label, area_label = \
             intersect_and_union(results[i], gt_seg_maps[i], num_classes,
@@ -65,11 +83,15 @@ def mean_iou(results, gt_seg_maps, num_classes, ignore_index, nan_to_num=None):
         total_area_union += area_union
         total_area_pred_label += area_pred_label
         total_area_label += area_label
+        
     all_acc = total_area_intersect.sum() / total_area_label.sum()
     acc = total_area_intersect / total_area_label
     iou = total_area_intersect / total_area_union
     dice= total_area_intersect*2.00/(total_area_pred_label+total_area_label)
+    
+    TP,FP,TN,FN= perf_measure(results,gt_seg_maps)
+    
     if nan_to_num is not None:
         return all_acc, np.nan_to_num(acc, nan=nan_to_num), \
             np.nan_to_num(iou, nan=nan_to_num), np.nan_to_num(dice, nan=nan_to_num)
-    return all_acc, acc, iou, dice
+    return all_acc, TP, FP, TN, FN, acc, iou, dice
