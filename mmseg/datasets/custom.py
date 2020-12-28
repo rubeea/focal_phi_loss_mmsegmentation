@@ -338,13 +338,13 @@ class CustomDataset(Dataset):
         else:
             num_classes = len(self.CLASSES)
 
-        all_acc, acc, iou, iou_test = mean_iou(
+        all_acc, TP, FP, TN, FN, acc, iou, dice = mean_iou(
             results, gt_seg_maps, num_classes, ignore_index=self.ignore_index)
         summary_str = ''
         summary_str += 'per class results:\n'
         print(iou_test)
         line_format = '{:<15} {:>10} {:>10} {:>10}\n'
-        summary_str += line_format.format('Class', 'IoU', 'Acc', 'IoU_Test')
+        summary_str += line_format.format('Class', 'IoU', 'Acc', 'Dice')
         if self.CLASSES is None:
             class_names = tuple(range(num_classes))
         else:
@@ -352,21 +352,29 @@ class CustomDataset(Dataset):
         for i in range(num_classes):
             iou_str = '{:.2f}'.format(iou[i] * 100)
             acc_str = '{:.2f}'.format(acc[i] * 100)
-            iou_test_str= '{:.2f}'.format(iou_test[i] * 100)
-            summary_str += line_format.format(class_names[i], iou_str, acc_str, iou_test_str)
+            dice_str= '{:.2f}'.format(dice[i] * 100)
+            summary_str += line_format.format(class_names[i], iou_str, acc_str, dice_str)
         summary_str += 'Summary:\n'
         line_format = '{:<15} {:>10} {:>10} {:>10}\n'
-        summary_str += line_format.format('Scope', 'mIoU', 'mAcc', 'aAcc')
+        summary_str += line_format.format('Scope', 'mIoU', 'mAcc', 'aAcc', 'TP', 'FP', 'TN', 'FN')
 
         iou_str = '{:.2f}'.format(np.nanmean(iou) * 100)
         acc_str = '{:.2f}'.format(np.nanmean(acc) * 100)
         all_acc_str = '{:.2f}'.format(all_acc * 100)
+        TP_str = '{:.2f}'.format(TP * 100)
+        FP_str = '{:.2f}'.format(FP * 100)
+        TN_str = '{:.2f}'.format(TN * 100)
+        FN_str = '{:.2f}'.format(FN * 100)
         summary_str += line_format.format('global', iou_str, acc_str,
-                                          all_acc_str)
+                                          all_acc_str, TP_str, FP_str, TN_str, FN_str)
         print_log(summary_str, logger)
 
         eval_results['mIoU'] = np.nanmean(iou)
         eval_results['mAcc'] = np.nanmean(acc)
         eval_results['aAcc'] = all_acc
-
+        eval_results['TP'] = TP
+        eval_results['FP'] = FP
+        eval_results['TN'] = TN
+        eval_results['FN'] = FN
+        
         return eval_results
