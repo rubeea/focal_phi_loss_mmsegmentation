@@ -38,7 +38,8 @@ def perf_measure(preds, labels):
     FP = 0
     TN = 0
     FN = 0
-
+    print(preds.shape)
+    print(labels.shape)
     for j in range(len(preds)): 
         if preds[j]==1 and labels[j]==1:
            TP += 1
