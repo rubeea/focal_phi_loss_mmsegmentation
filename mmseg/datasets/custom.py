@@ -342,7 +342,6 @@ class CustomDataset(Dataset):
             results, gt_seg_maps, num_classes, ignore_index=self.ignore_index)
         summary_str = ''
         summary_str += 'per class results:\n'
-        print(iou_test)
         line_format = '{:<15} {:>10} {:>10} {:>10}\n'
         summary_str += line_format.format('Class', 'IoU', 'Acc', 'Dice')
         if self.CLASSES is None:
@@ -355,7 +354,7 @@ class CustomDataset(Dataset):
             dice_str= '{:.2f}'.format(dice[i] * 100)
             summary_str += line_format.format(class_names[i], iou_str, acc_str, dice_str)
         summary_str += 'Summary:\n'
-        line_format = '{:<15} {:>10} {:>10} {:>10}\n'
+        line_format = '{:<15} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}\n'
         summary_str += line_format.format('Scope', 'mIoU', 'mAcc', 'aAcc', 'TP', 'FP', 'TN', 'FN')
 
         iou_str = '{:.2f}'.format(np.nanmean(iou) * 100)
