@@ -12,8 +12,17 @@ def tversky(inputs, targets, alpha, beta, smooth):
     inputs = inputs.sigmoid()
     targets= targets.type_as(inputs)
     # flatten label and prediction tensors
-    # inputs = inputs.view(-1)
-    # targets = targets.view(-1)
+    
+    print(inputs.shape)
+    print(targets.shape)
+    
+    print("Batch size")
+    print(inputs.shape[0])
+    print(targets.shape[0])
+    
+    
+#     inputs = inputs.view(-1)
+#     targets = targets.view(-1)
     
     # print(inputs.shape)
     # print(targets.shape)
