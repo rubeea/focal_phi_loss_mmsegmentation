@@ -38,17 +38,29 @@ def perf_measure(preds, labels):
     FP = 0
     TN = 0
     FN = 0
-    print(preds.shape)
-    print(labels.shape)
-    for j in range(len(preds)): 
-        if preds[j]==1 and labels[j]==1:
+
+    # print(preds.shape)
+    # print(labels.shape)
+
+    rows= labels.shape[0]
+    cols=labels.shape[1]
+    total_pixels= rows*cols
+
+    for i in range(0, rows):
+      for j in range(0, cols):
+        if preds[i,j]==1 and labels[i,j]==1:
            TP += 1
-        elif preds[j]==1 and labels[j]==0:
+        elif preds[i,j]==1 and labels[i,j]==0:
            FP += 1
-        elif preds[j]==0 and labels[j]==0:
+        elif preds[i,j]==0 and labels[i,j]==0:
            TN += 1
-        elif preds[j]==0 and labels[j]==1:
+        elif preds[i,j]==0 and labels[i,j]==1:
            FN += 1
+
+#     TP= TP/total_pixels
+#     FP= FP/total_pixels
+#     TN= TN/total_pixels
+#     FN= FN/total_pixels
 
     return (TP, FP, TN, FN)
 
@@ -75,6 +87,10 @@ def mean_iou(results, gt_seg_maps, num_classes, ignore_index, nan_to_num=None):
     total_area_union = np.zeros((num_classes, ), dtype=np.float)
     total_area_pred_label = np.zeros((num_classes, ), dtype=np.float)
     total_area_label = np.zeros((num_classes, ), dtype=np.float)
+    TP_list=[]
+    FP_list=[]
+    TN_list=[]
+    FN_list=[]
    
     for i in range(num_imgs):
         area_intersect, area_union, area_pred_label, area_label = \
@@ -84,15 +100,24 @@ def mean_iou(results, gt_seg_maps, num_classes, ignore_index, nan_to_num=None):
         total_area_union += area_union
         total_area_pred_label += area_pred_label
         total_area_label += area_label
+
+        TP,FP,TN,FN= perf_measure(results[i],gt_seg_maps[i])
+        TP_list.append(TP)
+        FP_list.append(FP)
+        TN_list.append(TN)
+        FN_list.append(FN)
         
     all_acc = total_area_intersect.sum() / total_area_label.sum()
     acc = total_area_intersect / total_area_label
     iou = total_area_intersect / total_area_union
     dice= total_area_intersect*2.00/(total_area_pred_label+total_area_label)
     
-    TP,FP,TN,FN= perf_measure(results,gt_seg_maps)
+    # print(type(results))
+    # print(type(gt_seg_maps))
+    
+    
     
     if nan_to_num is not None:
-        return all_acc, TP, FP, TN, FN, np.nan_to_num(acc, nan=nan_to_num), \
+        return all_acc, sum(TP_list)/num_imgs, sum(FP_list)/num_imgs, sum(TN_list)/num_imgs, sum(FN_list)/num_imgs, np.nan_to_num(acc, nan=nan_to_num), \
             np.nan_to_num(iou, nan=nan_to_num), np.nan_to_num(dice, nan=nan_to_num)
-    return all_acc, TP, FP, TN, FN, acc, iou, dice
+    return all_acc, sum(TP_list)/num_imgs, sum(FP_list)/num_imgs, sum(TN_list)/num_imgs, sum(FN_list)/num_imgs, acc, iou, dice
