@@ -102,7 +102,7 @@ class TverskyLoss(nn.Module):
     
         else:
             weight= weight.sum()
-            tversky_loss = (1. - tversky_val)
+            tversky_loss = torch.log(1. - tversky_val)
             # print(tversky_loss.shape) #[2,2,256,256]
             loss = weight_reduce_loss(tversky_loss, weight, reduction, None)
             loss = self.loss_weight * loss
