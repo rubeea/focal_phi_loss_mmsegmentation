@@ -13,12 +13,9 @@ def tversky(inputs, targets, alpha, beta, smooth):
     targets= targets.type_as(inputs)
     # flatten label and prediction tensors
     
-    print(inputs.shape)
-    print(targets.shape)
-    
-    print("Batch size")
-    print(inputs.shape[0])
-    print(targets.shape[0])
+#     print("Batch size")
+#     print(inputs.shape[0])
+#     print(targets.shape[0])
     
     
 #     inputs = inputs.view(-1)
