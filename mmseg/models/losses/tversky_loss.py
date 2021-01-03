@@ -5,7 +5,7 @@ import torch.nn.functional as F
 from ..builder import LOSSES
 from .utils import weight_reduce_loss
 from .cross_entropy_loss import _expand_onehot_labels
-
+from sklearn.metrics import jaccard_similarity_score as jsc
 
 def tversky(inputs, targets, alpha, beta, smooth):
     
@@ -32,10 +32,10 @@ def tversky(inputs, targets, alpha, beta, smooth):
     TP = (inputs * targets).sum()
     FP = ((1 - targets) * inputs).sum()
     FN = (targets * (1 - inputs)).sum()
-
+    iou= jsc(targets , inputs)
     Tversky = (TP + smooth) / (TP + alpha * FP + beta * FN + smooth)
 
-    return Tversky
+    return Tversky, iou
 
 
 @LOSSES.register_module()
@@ -93,7 +93,7 @@ class TverskyLoss(nn.Module):
                                                 ignore_index) #use imported version from cross_entropy_loss
         
         
-        tversky_val = tversky(inputs, label, self.alpha, self.beta, self.smooth)
+        tversky_val,iou = tversky(inputs, label, self.alpha, self.beta, self.smooth)
     
         if self.use_focal:
             focal_tversky_loss = (1. - tversky_val) ** self.gamma
@@ -102,8 +102,10 @@ class TverskyLoss(nn.Module):
     
         else:
             weight= weight.sum()
-            tversky_loss = torch.log(1. - tversky_val)
+            tversky_loss = 1. - tversky_val
+            iou_loss= 1. - iou
+            print(iou_loss
             # print(tversky_loss.shape) #[2,2,256,256]
-            loss = weight_reduce_loss(tversky_loss, weight, reduction, None)
+            loss = weight_reduce_loss(iou_loss, weight, reduction, None)
             loss = self.loss_weight * loss
         return loss
