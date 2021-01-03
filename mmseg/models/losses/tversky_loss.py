@@ -102,9 +102,9 @@ class TverskyLoss(nn.Module):
     
         else:
             weight= weight.sum()
-            tversky_loss = 1. - tversky_val
-            iou_loss= 1. - iou
-            print(iou_loss
+            tversky_loss = (1. - tversky_val)
+            iou_loss= (1. - iou)
+            print(iou_loss)
             # print(tversky_loss.shape) #[2,2,256,256]
             loss = weight_reduce_loss(iou_loss, weight, reduction, None)
             loss = self.loss_weight * loss
