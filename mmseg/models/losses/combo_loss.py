@@ -7,7 +7,7 @@ from .utils import weight_reduce_loss
 from .cross_entropy_loss import _expand_onehot_labels
 
 
-def tversky(inputs, targets, alpha, beta, smooth):
+def tversky_val(inputs, targets, alpha, beta, smooth):
     
     inputs = inputs.sigmoid()
     targets= targets.type_as(inputs)
@@ -99,7 +99,7 @@ class ComboLoss(nn.Module):
 
         #fl = weight_reduce_loss(fl, weight, reduction, None)
         print(type(fl))     
-        tversky_val = tversky(inputs, label, self.alpha, self.beta, self.smooth)
+        tversky_val = tversky_val(inputs, label, self.alpha, self.beta, self.smooth)
         
         tversky_loss = (1. - tversky_val)
         weight= weight.sum()
