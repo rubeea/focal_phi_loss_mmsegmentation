@@ -6,32 +6,29 @@ from ..builder import LOSSES
 from .utils import weight_reduce_loss
 from .cross_entropy_loss import _expand_onehot_labels
 
-def tversky(inputs, targets, alpha, beta, smooth):
+def tversky_loss(inputs, targets, alpha, beta, gamma, smooth, use_focal=False, weight=None, reduction='mean',
+                  avg_factor=None):
     
     inputs = inputs.sigmoid()
     targets= targets.type_as(inputs)
     # flatten label and prediction tensors
     inputs = inputs.view(-1)
     targets = targets.view(-1)
+    weight= weight.sum()
     
-#     print("Batch size")
-#     print(inputs.shape[0])
-#     print(targets.shape[0])
-        
-    # print(inputs.shape)
-    # print(targets.shape)
-    # True Positives, False Positives & False Negatives
-
     #removing .sum() to keep the tensor dimensions to [2,2,256,256] compatible with weight dimensions
     # to use .sum with TP,FP and FN, weights must also be summed using .sum() in weighted reduction loss
-    
 
     TP = (inputs * targets).sum()
     FP = ((1 - targets) * inputs).sum()
     FN = (targets * (1 - inputs)).sum()
     Tversky = (TP + smooth) / (TP + alpha * FP + beta * FN + smooth)
-
-    return Tversky
+    if use_focal:
+        loss = (1. - Tversky) ** gamma #focal tversky loss
+    else:
+        loss= (1. - Tversky) #tversky_loss
+    loss = weight_reduce_loss(loss, weight=weight, reduction=reduction, avg_factor=avg_factor)
+    return loss
 
 
 @LOSSES.register_module()
@@ -72,6 +69,7 @@ class TverskyLoss(nn.Module):
                 targets,
                 weight=None,
                 reduction_override=None,
+                avg_factor=None,
                 ignore_index=255):
         """Forward function."""
         assert reduction_override in (None, 'none', 'mean', 'sum')
@@ -87,20 +85,9 @@ class TverskyLoss(nn.Module):
             'H, W], label shape [N, H, W] are supported'
             label, weight = _expand_onehot_labels(targets, weight, inputs.shape,
                                                 ignore_index) #use imported version from cross_entropy_loss
-        
-        
-        tversky_val,iou = tversky(inputs, label, self.alpha, self.beta, self.smooth)
-    
-        if self.use_focal:
-            focal_tversky_loss = (1. - tversky_val) ** self.gamma
-            loss = weight_reduce_loss(focal_tversky_loss, weight, reduction, None)
-            loss = self.loss_weight * loss
-    
-        else:
-            weight= weight.sum()
-            tversky_loss = (1. - tversky_val)
-            tversky_loss= torch.log10((torch.exp(tversky_loss)+torch.exp(-tversky_loss))/2.0)
-            # print(tversky_loss.shape) #[2,2,256,256]
-            loss = weight_reduce_loss(tversky_loss, weight, reduction, None)
-            loss = self.loss_weight * loss
+        loss = self.loss_weight * tversky_loss(inputs, label, 
+                                               self.alpha, self.beta, self.gamma, self.smooth, self.use_focal,
+                                               weight, reduction= reduction, avg_factor=avg_factor 
+                                                )
+        print(loss)
         return loss
