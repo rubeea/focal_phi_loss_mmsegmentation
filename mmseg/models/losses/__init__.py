@@ -5,10 +5,13 @@ from .utils import reduce_loss, weight_reduce_loss, weighted_loss
 from .focal_loss import FocalLoss 
 from .tversky_loss import (TverskyLoss, tversky_loss)
 from .phi_loss import (PhiLoss, phi_loss)
+from .j_loss import (JLoss, j_loss)
+from .fm_loss import (FMLoss, fm_loss)
 from .combo_loss import ComboLoss
 
 __all__ = [
     'accuracy', 'Accuracy', 'cross_entropy', 'binary_cross_entropy',
     'mask_cross_entropy', 'CrossEntropyLoss', 'reduce_loss',
-    'weight_reduce_loss', 'weighted_loss', 'FocalLoss', 'TverskyLoss', 'tversky_loss', 'PhiLoss', 'phi_loss', 'ComboLoss'
+    'weight_reduce_loss', 'weighted_loss', 'FocalLoss', 'TverskyLoss', 'tversky_loss', 'PhiLoss', 'phi_loss', 
+    'JLoss', 'j_loss','ComboLoss', 'FMLoss', 'fm_loss'
 ]
