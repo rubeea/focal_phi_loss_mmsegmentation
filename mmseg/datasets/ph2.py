@@ -13,7 +13,7 @@ class PH2Dataset(CustomDataset):
     '_.png'.
     """
 
-    CLASSES = ('background', 'powerline')
+    CLASSES = ('background', 'lesion')
 
     PALETTE = [[120, 120, 120], [6, 230, 230]]
 
