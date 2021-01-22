@@ -3,7 +3,7 @@ import os
 import os.path as osp
 import tempfile
 import zipfile
-
+from PIL import Image
 import mmcv
 
 def parse_args():
@@ -22,7 +22,7 @@ def parse_args():
 def main():
     args = parse_args()
     if args.out_dir is None:
-        out_dir = osp.join('data', 'ph2')
+        out_dir = osp.join('/content/pldu_mmsegmentation/data', 'ph2')
     else:
         out_dir = args.out_dir
 
@@ -35,48 +35,47 @@ def main():
     mmcv.mkdir_or_exist(osp.join(out_dir, 'ann_dir', 'train'))
     mmcv.mkdir_or_exist(osp.join(out_dir, 'ann_dir', 'val'))
 
-    print('Generating images...')
-    for now_path in args.images_path:
-        with tempfile.TemporaryDirectory(dir=args.tmp_dir) as tmp_dir:
-            zip_file = zipfile.ZipFile(now_path)
-            zip_file.extractall(tmp_dir)
+    with tempfile.TemporaryDirectory(dir=args.tmp_dir) as tmp_dir:
+      print('Extracting images.zip...')
+      zip_file = zipfile.ZipFile(args.images_path)
+      zip_file.extractall(tmp_dir)
 
-            TRAINING_LEN = len(os.listdir(tmp_dir))*0.8 #80% of the data for training and the remainig 20% for validation
-            
-            for filename in sorted(os.listdir(tmp_dir))[:TRAINING_LEN]:
-                img = mmcv.imread(osp.join(tmp_dir, filename))
-                mmcv.imwrite(
-                    img,
-                    osp.join(out_dir, 'img_dir','train',
-                             osp.splitext(filename)[0] + '.jpg'))
-            for filename in sorted(os.listdir(tmp_dir))[TRAINING_LEN:]:
-                img = mmcv.imread(osp.join(tmp_dir, filename))
-                mmcv.imwrite(
-                    img,
-                    osp.join(out_dir, 'img_dir',val',
-                             osp.splitext(filename)[0] + '.jpg'))
+      now_dir = osp.join(tmp_dir, 'images')
+      TRAINING_LEN = int(len(os.listdir(now_dir))*0.8) #80% of the data for training and the remainig 20% for validation
+      
+      print('Generating image training dataset...')
+      for filename in sorted(os.listdir(now_dir))[:TRAINING_LEN]:
+        img = Image.open(osp.join(now_dir, filename))
+        img = img.save(osp.join(out_dir, 'img_dir', 'train',
+                                    osp.splitext(filename)[0] + '.jpg'))
+      
+      print('Generating image validation dataset...')
+      for filename in sorted(os.listdir(now_dir))[TRAINING_LEN:]:
+        img = Image.open(osp.join(now_dir, filename))
+        img = img.save(osp.join(out_dir, 'img_dir', 'val',
+                                    osp.splitext(filename)[0] + '.jpg'))
 
-    print('Generating annotations...')
-    for now_path in args.labels_path:
-        with tempfile.TemporaryDirectory(dir=args.tmp_dir) as tmp_dir:
-            zip_file = zipfile.ZipFile(now_path)
-            zip_file.extractall(tmp_dir)
+   
+    with tempfile.TemporaryDirectory(dir=args.tmp_dir) as tmp_dir:
+      print('Extracting labels.zip...')
+      zip_file = zipfile.ZipFile(args.labels_path)
+      zip_file.extractall(tmp_dir)
 
-            TRAINING_LEN = len(os.listdir(tmp_dir))*0.8 #80% of the data for training and the remainig 20% for validation
+      now_dir = osp.join(tmp_dir, 'gt')
+      TRAINING_LEN = int(len(os.listdir(now_dir))*0.8) #80% of the data for training and the remainig 20% for validation
 
-            for filename in sorted(os.listdir(tmp_dir))[:TRAINING_LEN]:
-                img = mmcv.imread(osp.join(tmp_dir, filename))
+      print('Generating annotations for training dataset...')
+      for filename in sorted(os.listdir(now_dir))[:TRAINING_LEN]:
+        img = Image.open(osp.join(now_dir, filename))
                 
-                mmcv.imwrite(
-                    img,
-                    osp.join(out_dir, 'ann_dir', 'train',
-                             osp.splitext(filename)[0] + '.png'))
-            for filename in sorted(os.listdir(tmp_dir))[TRAINING_LEN:]:
-                img = mmcv.imread(osp.join(tmp_dir, filename))
-                mmcv.imwrite(
-                    img,
-                    osp.join(out_dir, 'ann_dir', 'val',
-                             osp.splitext(filename)[0] + '.png'))
+        img = img.save(osp.join(out_dir, 'ann_dir', 'train',
+                                    osp.splitext(filename)[0] + '.png'))
+
+      print('Generating annotations for validation dataset...')
+      for filename in sorted(os.listdir(now_dir))[TRAINING_LEN:]:
+        img = Image.open(osp.join(now_dir, filename))
+        img = img.save(osp.join(out_dir, 'ann_dir', 'val',
+                                    osp.splitext(filename)[0] + '.png'))
 
     print('Done!')
 
