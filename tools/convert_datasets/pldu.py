@@ -36,7 +36,7 @@ def main():
     val_labels_path = args.val_labels_path
 
     if args.out_dir is None:
-        out_dir = osp.join('data', 'pldu')
+        out_dir = osp.join('/content/pldu_mmsegmentation/data', 'pldu')
     else:
         out_dir = args.out_dir
 
