@@ -20,7 +20,7 @@ class ISICDataset(CustomDataset):
     def __init__(self, **kwargs):
         super(ISICDataset, self).__init__(
             img_suffix='.jpg',
-            seg_map_suffix='.png',
+            seg_map_suffix='_segmentation.png',
             reduce_zero_label=False,
             **kwargs)
         assert osp.exists(self.img_dir)
