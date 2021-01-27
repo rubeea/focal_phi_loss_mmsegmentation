@@ -352,28 +352,37 @@ class CustomDataset(Dataset):
             iou_str = '{:.2f}'.format(iou[i] * 100)
             acc_str = '{:.2f}'.format(acc[i] * 100)
             dice_str= '{:.2f}'.format(dice[i] * 100)
-            summary_str += line_format.format(class_names[i], iou_str, acc_str, dice_str)
+            summary_str += line_format.format(class_names[i], iou_str, dice_str, acc_str)
         summary_str += 'Summary:\n'
-        line_format = '{:<15} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}\n'
-        summary_str += line_format.format('Scope', 'mIoU', 'mAcc', 'aAcc', 'TP', 'FP', 'TN', 'FN')
+        line_format = '{:<15} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}\n'
+        summary_str += line_format.format('Scope', 'mIoU', 'mDice' , 'mAcc', 'aAcc', 'TPR', 'TNR', 'FDR', 'Precision')
 
         iou_str = '{:.2f}'.format(np.nanmean(iou) * 100)
+        dice_str = '{:.2f}'.format(np.nanmean(dice) * 100)
         acc_str = '{:.2f}'.format(np.nanmean(acc) * 100)
         all_acc_str = '{:.2f}'.format(all_acc * 100)
-        TP_str = '{:.2f}'.format(TP * 100)
-        FP_str = '{:.2f}'.format(FP * 100)
-        TN_str = '{:.2f}'.format(TN * 100)
-        FN_str = '{:.2f}'.format(FN * 100)
-        summary_str += line_format.format('global', iou_str, acc_str,
-                                          all_acc_str, TP_str, FP_str, TN_str, FN_str)
+
+        TPR= (TP/(TP+FN)) if (TP+FN) !=0 else 0
+        TNR= (TN/(TN+FP)) if (TN+FP) !=0 else 0
+        FDR= (FP/(FP+TP)) if (FP+TP) !=0 else 0
+        precision= (TP/(TP+FP)) if (TP+FP) !=0 else 0
+
+        TPR_str = '{:.2f}'.format(TPR * 100)
+        TNR_str = '{:.2f}'.format(TNR * 100)
+        FDR_str = '{:.2f}'.format(FDR * 100)
+        precision_str = '{:.2f}'.format(precision * 100)
+        summary_str += line_format.format('global', iou_str, dice_str, acc_str,
+                                          all_acc_str, TPR_str, TNR_str, FDR_str, precision_str)
         print_log(summary_str, logger)
 
         eval_results['mIoU'] = np.nanmean(iou)
+        eval_results['mDice'] = np.nanmean(dice)
         eval_results['mAcc'] = np.nanmean(acc)
         eval_results['aAcc'] = all_acc
-        eval_results['TP'] = TP
-        eval_results['FP'] = FP
-        eval_results['TN'] = TN
-        eval_results['FN'] = FN
+
+        eval_results['TPR'] = TPR
+        eval_results['TNR'] = TNR
+        eval_results['FDR'] = FDR
+        eval_results['Precision'] = precision
         
         return eval_results
