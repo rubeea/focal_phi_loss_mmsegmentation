@@ -167,6 +167,16 @@ class BaseSegmentor(nn.Module):
         not implemented with this method, but an evaluation hook.
         """
         output = self(**data_batch, **kwargs)
+        loss, log_vars = self._parse_losses(output)
+        log_vars_val = OrderedDict()
+        for k,v in log_vars.items():
+            new_key = 'val_' + k
+            log_vars_val[new_key] = v
+
+        output = dict(
+            loss=loss,
+            log_vars=log_vars_val,
+            num_samples=len(data_batch['img'].data))
         return output
 
     @staticmethod
