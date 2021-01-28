@@ -343,19 +343,32 @@ class CustomDataset(Dataset):
         summary_str = ''
         summary_str += 'per class results:\n'
         line_format = '{:<15} {:>10} {:>10} {:>10}\n'
-        summary_str += line_format.format('Class', 'IoU', 'Acc', 'Dice')
+        summary_str += line_format.format('Class', 'IoU', 'Dice', 'Acc')
         if self.CLASSES is None:
             class_names = tuple(range(num_classes))
         else:
             class_names = self.CLASSES
+        
+        # to record class-wise dice scores
+        dice_pos_str=''
+        dice_neg_str=''
+        
         for i in range(num_classes):
             iou_str = '{:.2f}'.format(iou[i] * 100)
             acc_str = '{:.2f}'.format(acc[i] * 100)
-            dice_str= '{:.2f}'.format(dice[i] * 100)
+            
+            dice_score= dice[i] * 100
+            dice_str= '{:.2f}'.format(dice_score)
+            
+            if i==0: #background class
+                dice_neg_str= '{:.2f}'.format(dice_score)
+            else: #positive class 
+                dice_pos_str= '{:.2f}'.format(dice_score)
+                
             summary_str += line_format.format(class_names[i], iou_str, dice_str, acc_str)
         summary_str += 'Summary:\n'
-        line_format = '{:<15} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}\n'
-        summary_str += line_format.format('Scope', 'mIoU', 'mDice' , 'mAcc', 'aAcc', 'TPR', 'TNR', 'FDR', 'Precision')
+        line_format = '{:<15} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10} {:>10}\n'
+        summary_str += line_format.format('Scope', 'mIoU', 'mDice' , 'Powerline Dice' , 'Background Dice' , 'mAcc', 'aAcc', 'TPR', 'TNR', 'FDR', 'Precision')
 
         iou_str = '{:.2f}'.format(np.nanmean(iou) * 100)
         dice_str = '{:.2f}'.format(np.nanmean(dice) * 100)
@@ -371,7 +384,7 @@ class CustomDataset(Dataset):
         TNR_str = '{:.2f}'.format(TNR * 100)
         FDR_str = '{:.2f}'.format(FDR * 100)
         precision_str = '{:.2f}'.format(precision * 100)
-        summary_str += line_format.format('global', iou_str, dice_str, acc_str,
+        summary_str += line_format.format('global', iou_str, dice_str, dice_pos_str, dice_neg_str, acc_str,
                                           all_acc_str, TPR_str, TNR_str, FDR_str, precision_str)
         print_log(summary_str, logger)
 
