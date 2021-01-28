@@ -352,6 +352,8 @@ class CustomDataset(Dataset):
         # to record class-wise dice scores
         dice_pos_str=''
         dice_neg_str=''
+        pl_dice=0
+        bg_dice=0
         
         for i in range(num_classes):
             iou_str = '{:.2f}'.format(iou[i] * 100)
@@ -362,8 +364,11 @@ class CustomDataset(Dataset):
             
             if i==0: #background class
                 dice_neg_str= '{:.2f}'.format(dice_score)
+                bg_dice= dice_score
+                
             else: #positive class 
                 dice_pos_str= '{:.2f}'.format(dice_score)
+                pl_dice= dice_score
                 
             summary_str += line_format.format(class_names[i], iou_str, dice_str, acc_str)
         summary_str += 'Summary:\n'
@@ -391,6 +396,9 @@ class CustomDataset(Dataset):
         eval_results['mIoU'] = np.nanmean(iou)
         eval_results['mDice'] = np.nanmean(dice)
         eval_results['mAcc'] = np.nanmean(acc)
+        
+        eval_results['plDice'] = pl_dice
+        eval_results['bgDice'] = bg_dice
         eval_results['aAcc'] = all_acc
 
         eval_results['TPR'] = TPR
