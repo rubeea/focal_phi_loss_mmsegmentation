@@ -12,11 +12,12 @@ from .voc import PascalVOCDataset
 from .pldu import PLDUDataset
 from .ph2 import PH2Dataset
 from .isic import ISICDataset
+from .mendeley import MendeleyDataset
 
 __all__ = [
     'CustomDataset', 'build_dataloader', 'ConcatDataset', 'RepeatDataset',
     'DATASETS', 'build_dataset', 'PIPELINES', 'CityscapesDataset',
     'PascalVOCDataset', 'ADE20KDataset', 'PascalContextDataset',
     'ChaseDB1Dataset', 'DRIVEDataset', 'HRFDataset', 'STAREDataset', 
-    'PLDUDataset', 'PH2Dataset', 'ISICDataset'
+    'PLDUDataset', 'PH2Dataset', 'ISICDataset', 'MendeleyDataset'
 ]
