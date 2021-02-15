@@ -3,18 +3,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from ..builder import LOSSES
-from .utils import weight_reduce_loss
+from .utils import reduce_loss
 from .cross_entropy_loss import _expand_onehot_labels
 
-def tversky_loss(inputs, targets, alpha, beta, gamma, smooth, use_focal=False, weight=None, reduction='mean',
-                  avg_factor=None):
+def tversky_loss(inputs, targets, alpha, beta, gamma, smooth, use_focal=False, reduction='mean'):
     
     inputs = inputs.sigmoid()
     targets= targets.type_as(inputs)
     # flatten label and prediction tensors
     inputs = inputs.view(-1)
     targets = targets.view(-1)
-    weight= weight.sum()
     
     #removing .sum() to keep the tensor dimensions to [2,2,256,256] compatible with weight dimensions
     # to use .sum with TP,FP and FN, weights must also be summed using .sum() in weighted reduction loss
@@ -27,7 +25,7 @@ def tversky_loss(inputs, targets, alpha, beta, gamma, smooth, use_focal=False, w
         loss = (1. - Tversky) ** gamma #focal tversky loss
     else:
         loss= (1. - Tversky) #tversky_loss
-    loss = weight_reduce_loss(loss, weight=weight, reduction=reduction, avg_factor=avg_factor)
+    loss = reduce_loss(loss, reduction=reduction)
     return loss
 
 
@@ -87,7 +85,6 @@ class TverskyLoss(nn.Module):
                                                 ignore_index) #use imported version from cross_entropy_loss
         loss = self.loss_weight * tversky_loss(inputs, label, 
                                                self.alpha, self.beta, self.gamma, self.smooth, self.use_focal,
-                                               weight, reduction= reduction, avg_factor=avg_factor 
+                                               reduction= reduction 
                                                 )
-        print(loss)
         return loss
