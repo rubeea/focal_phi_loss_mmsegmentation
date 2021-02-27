@@ -1,3 +1,7 @@
+/*
+Script to convert the validation ground truth of pldu in .mat format to .png image format
+*/
+
 import scipy.io
 import os
 import numpy as np
