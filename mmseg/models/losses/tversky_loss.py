@@ -10,12 +10,11 @@ def tversky_loss(inputs, targets, alpha, beta, gamma, smooth, use_focal=False, r
     
     inputs = inputs.sigmoid()
     targets= targets.type_as(inputs)
+    
     # flatten label and prediction tensors
     inputs = inputs.view(-1)
     targets = targets.view(-1)
-    
-    #removing .sum() to keep the tensor dimensions to [2,2,256,256] compatible with weight dimensions
-    # to use .sum with TP,FP and FN, weights must also be summed using .sum() in weighted reduction loss
+   
 
     TP = (inputs * targets).sum()
     FP = ((1 - targets) * inputs).sum()
@@ -73,6 +72,7 @@ class TverskyLoss(nn.Module):
         assert reduction_override in (None, 'none', 'mean', 'sum')
         reduction = (
             reduction_override if reduction_override else self.reduction)
+        
         # print(inputs.shape) #[2,2,256,256] => [N,C,H,W]
         # print(targets.shape) #[2,256,256] => [N,H,W]
 
