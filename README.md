@@ -14,7 +14,8 @@ This repository holds the source code for Focal Phi Loss, a novel loss function 
 Python >= 3.6  
 PyTorch == 1.7, tested on CUDA 10.1. The models were trained and evaluated on PyTorch 1.7.
 Torch Vision==0.8.1  
-Torchaudio==0.7.0  
+Torchaudio==0.7.0
+MMSegmentation
 MMCCV ==1.1.4  
 Other dependencies described in requirements.txt  
 
@@ -28,7 +29,7 @@ The two benchmark Power line (PL) datasets used in this research are:
 1. Mendeley PL dataset available at: https://data.mendeley.com/datasets/twxp8xccsw/8  
 2. Power line dataset of urban scenes (PLDU) available at: https://drive.google.com/drive/folders/1XjoWvHm2I8Y4RV_i9gEd93ZP-KryjJlm  
 
-The train/val splits of these datasets used in the experiments can be found at: [dataset_files](../dataset_files)
+The train/val splits of these datasets used in the experiments can be found at: [dataset_files](../blob/master/dataset_files)
 
 ## License
 
