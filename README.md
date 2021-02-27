@@ -31,6 +31,18 @@ The two benchmark Power line (PL) datasets used in this research are:
 
 The train/val splits of these datasets used in the experiments can be found at: [dataset_files](../master/dataset_files)
 
+## Models
+Auxiliary Classifier U-Net (ACU-Net)
+Vanilla U-NET
+
+## Train and Test Models on PL datasets
+To train and test the ACU-Net model on:
+  Mendeley dataset [acunet_mendeley](../master/dataset_files)
+  PLDU dataset [acunet_pldu](../master/dataset_files)
+  
+To train and test the Vanilla U-Net model on:
+  Mendeley dataset [vanilla_unet_mendeley](../master/dataset_files)
+  PLDU dataset [vanilla_unet_pldu](../master/dataset_files)
 ## License
 
 This project is released under the [Apache 2.0 license](LICENSE).
