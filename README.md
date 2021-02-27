@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="resources/acunet.png" width="600"/>
+  <img src="acunet.png" width="600"/>
 </div>
 <br />
 
