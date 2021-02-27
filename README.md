@@ -24,10 +24,10 @@ https://mmsegmentation.readthedocs.io/en/latest/
 
 ### Datasets
 The two benchmark Power line (PL) datasets used in this research are:
-1. Mendeley PL dataset available at:
-2. Power line dataset of urban scenes (PLDU) available at: 
+1. Mendeley PL dataset available at: https://data.mendeley.com/datasets/twxp8xccsw/8  
+2. Power line dataset of urban scenes (PLDU) available at: https://drive.google.com/drive/folders/1XjoWvHm2I8Y4RV_i9gEd93ZP-KryjJlm  
 
-The train/val splits of these datasets can be found at: [dataset_files](../dataset_files)
+The train/val splits of these datasets used in the experiments can be found at: [dataset_files](../dataset_files)
 
 ## License
 
