@@ -11,8 +11,11 @@ This repository holds the source code for Focal Phi Loss, a novel loss function 
 
 
 ### Prerequisites
-Python >= 3.5  
+Python >= 3.6  
 PyTorch == 1.7, tested on CUDA 10.1. The models were trained and evaluated on PyTorch 1.7.
+Torch Vision==0.8.1  
+Torchaudio==0.7.0  
+MMCCV ==1.1.4  
 Other dependencies described in requirements.txt  
 
 ### Install
