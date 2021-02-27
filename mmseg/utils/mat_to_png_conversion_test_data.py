@@ -1,5 +1,5 @@
 /*
-Script to convert the validation ground truth of pldu in .mat format to .png image format
+# Script to convert the validation ground truth of pldu in .mat format to .png image format
 */
 
 import scipy.io
