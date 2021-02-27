@@ -1,9 +1,13 @@
+/*
+Script for calculating mean and std deviation of the training image dataset
+*/
+
 import numpy as np
 from PIL import Image
 import os
 import glob
 
-src_dir = "C:/Users/Xyedj/Desktop/datasets/wires/PLDU/pldu dataset/train/aug_data/0.0_0"
+src_dir = "C:/Users/Xyedj/Desktop/datasets/wires/PLDU/pldu dataset/train/aug_data/0.0_0" #path to dir containing training images
 mean_dataset=0
 std_dataset=0
 len_dataset= len(os.listdir(src_dir))
