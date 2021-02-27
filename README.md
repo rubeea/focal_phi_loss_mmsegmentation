@@ -37,12 +37,12 @@ Vanilla U-NET
 
 ## Train and Test Models on PL datasets
 To train and test the ACU-Net model on:  
-  Mendeley dataset [acunet_mendeley](../master/dataset_files)  
-  PLDU dataset [acunet_pldu](../master/dataset_files)  
+  Mendeley dataset [acunet_mendeley](../master/focal_phi_loss_mendeley_acunet.ipynb)  
+  PLDU dataset [acunet_pldu](../master/focal_phi_loss_pldu_acunet.ipynb)  
   
 To train and test the Vanilla U-Net model on:  
-  Mendeley dataset [vanilla_unet_mendeley](../master/dataset_files)  
-  PLDU dataset [vanilla_unet_pldu](../master/dataset_files)  
+  Mendeley dataset [vanilla_unet_mendeley](../master/focal_phi_loss_mendeley_vanilla_unet.ipynb)  
+  PLDU dataset [vanilla_unet_pldu](../master/focal_phi_loss_pldu_vanilla_unet.ipynb)  
 ## License
 
 This project is released under the [Apache 2.0 license](LICENSE).
