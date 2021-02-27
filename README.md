@@ -22,7 +22,7 @@ The code in this repo is built using the mmsegmentation framework. For more info
 https://github.com/open-mmlab/mmsegmentation
 https://mmsegmentation.readthedocs.io/en/latest/
 
-###Datasets
+### Datasets
 The two benchmark Power line (PL) datasets used in this research are:
 1. Mendeley PL dataset available at:
 2. Power line dataset of urban scenes (PLDU) available at: 
