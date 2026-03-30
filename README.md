@@ -8,6 +8,7 @@
 ## Focal Phi Loss with ACU-Net
 
 This repository holds the source code for Focal Phi Loss, a novel loss function for highly imbalanced datasets applied to Power line detection with Auxiliary Classifier U-Net (ACU-Net), by Rabeea Jaffari, Manzoor Ahmed Hashmani and Constantino Carlos Reyes-Aldasoro.
+Research Paper Available at: https://www.mdpi.com/1424-8220/21/8/2803
 
 
 ### Prerequisites
